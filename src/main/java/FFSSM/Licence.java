@@ -1,6 +1,3 @@
-/**
- * @(#) LicencePlongeur.java
- */
 package FFSSM;
 
 import java.time.LocalDate;
@@ -8,16 +5,12 @@ import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter @Setter
 public class Licence {
-    @Getter @Setter
+
     public Plongeur possesseur;
-
     public String numero;
-
-    @Getter @Setter
     public LocalDate delivrance;
-
-    @Getter @Setter
     public Club club;
 
     public Licence(Plongeur possesseur, String numero, LocalDate delivrance, Club club) {
@@ -34,8 +27,10 @@ public class Licence {
      * @return vrai si valide à la date d
      **/
     public boolean estValide(LocalDate d) {
-         // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
-    }
+        // La date d'expiration est 1 an après la date de délivrance
+        LocalDate expiration = delivrance.plusYears(1);
 
+        // Valide si la date d est après ou égale à la délivrance ET avant la date d'expiration (le jour anniversaire)
+        return !d.isBefore(delivrance) && d.isBefore(expiration);
+    }
 }

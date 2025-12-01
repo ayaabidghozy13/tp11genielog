@@ -1,44 +1,56 @@
-/**
- * @(#) Plongee.java
- */
 package FFSSM;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
+import lombok.Getter;
+
+@Getter
 public class Plongee {
 
-	public Site lieu;
+    private final Site lieu;
+    private final DiplomeDeMoniteur chefDePalanquee;
+    private final LocalDate date;
+    private final int profondeur;
+    private final int duree;
 
-	public DiplomeDeMoniteur chefDePalanquee;
+    // Association *participants* vers Plongeur (palanquée) (1..*)
+    private final Set<Plongeur> participants = new HashSet<>();
 
-	public LocalDate date;
+    public Plongee(Site lieu, DiplomeDeMoniteur chefDePalanquee, LocalDate date, int profondeur, int duree) {
+        this.lieu = lieu;
+        this.chefDePalanquee = chefDePalanquee;
+        this.date = date;
+        this.profondeur = profondeur;
+        this.duree = duree;
+    }
 
-	public int profondeur;
+    public void ajouteParticipant(Plongeur participant) {
+        participants.add(participant);
+    }
 
-	public int duree;
+    /**
+     * Détermine si la plongée est conforme.
+     * Une plongée est conforme si tous les plongeurs de la palanquée (y compris le chef)
+     * ont une licence valide à la date de la plongée
+     * @return vrai si la plongée est conforme
+     */
+    public boolean estConforme() {
+        Plongeur chef = chefDePalanquee.getPossesseur();
+        Licence licenceChef = chef.derniereLicence();
 
-	public Plongee(Site lieu, DiplomeDeMoniteur chefDePalanquee, LocalDate date, int profondeur, int duree) {
-		this.lieu = lieu;
-		this.chefDePalanquee = chefDePalanquee;
-		this.date = date;
-		this.profondeur = profondeur;
-		this.duree = duree;
-	}
+        if (licenceChef == null || !licenceChef.estValide(this.date)) {
+            return false;
+        }
 
-	public void ajouteParticipant(Plongeur participant) {
-		// TODO: Implémenter cette méthode
-		throw new UnsupportedOperationException("Pas encore implémenté");
-	}
+        for (Plongeur p : participants) {
+            Licence licenceParticipant = p.derniereLicence();
+            if (licenceParticipant == null || !licenceParticipant.estValide(this.date)) {
+                return false;
+            }
+        }
 
-	/**
-	 * Détermine si la plongée est conforme. 
-	 * Une plongée est conforme si tous les plongeurs de la palanquée ont une
-	 * licence valide à la date de la plongée
-	 * @return vrai si la plongée est conforme
-	 */
-	public boolean estConforme() {
-		// TODO: Implémenter cette méthode
-		throw new UnsupportedOperationException("Pas encore implémenté");
-	}
-
+        return true;
+    }
 }
